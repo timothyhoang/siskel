@@ -16,14 +16,24 @@ var Movies = Backbone.Collection.extend({
 
   initialize: function() {
     this.on('change', function(movie) {
-      this.sortByField();
+      this.sortByField(this.comparator);
     });
   },
 
   comparator: 'title',
 
   sortByField: function(field) {
-    this.comparator = field || this.comparator;
+    if (this.comparator === field) {
+      this.comparator = function(movie1, movie2) {
+        if (typeof movie1.get(field) === 'string') {
+          return movie2.get(field).localeCompare(movie1.get(field));
+        } else {
+          return movie2.get(field) - movie1.get(field);
+        }
+      };
+    } else {
+      this.comparator = field;
+    }
     this.sort();
   }
 
